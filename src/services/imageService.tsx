@@ -40,7 +40,7 @@ async function uploadBase64Image(base64String: string): Promise<any> {
   }
 }
 
-async function getDataPay(image_url: string): Promise<string | undefined> {
+async function getDataPay(image_url: string): Promise<any> {
   try {
     // Envia os dados base64 para o serviço
     const response = await axios.post('https://rio-2024.replit.app/url', {
@@ -78,8 +78,9 @@ export class FirebaseImageService implements ICamImages {
         console.log(url)
 
         const resp = await getDataPay(url)
+        const {CNPJ, TOTAL} = resp
 
-        console.log(resp)
+        console.log(CNPJ, TOTAL)
         
         return response;
       } catch (error) {
