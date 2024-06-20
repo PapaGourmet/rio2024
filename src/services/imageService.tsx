@@ -1,6 +1,7 @@
 import { CamImages, ICamImages } from "../interfaces/interfaces";
 import axios, { AxiosError } from 'axios';
 import RNFS from 'react-native-fs';
+
 async function uriToBase64(uri: string): Promise<string> {
   try {
     // Lê o arquivo na URI como base64
@@ -13,14 +14,17 @@ async function uriToBase64(uri: string): Promise<string> {
   }
 }
 
-async function uploadBase64Image(base64String: string): Promise<void> {
+async function uploadBase64Image(base64String: string): Promise<any> {
   try {
     // Envia os dados base64 para o serviço
     const response = await axios.post('https://firebase-upload-image-storage-fczdesenvolvime.replit.app/upload', {
       base64: base64String,
     });
 
-    console.log('Resposta do servidor:', response.data);
+    const { filename } = response.data
+
+    return filename;
+
   } catch (error) {
     if (axios.isAxiosError(error)) {
       // O erro é do Axios
@@ -36,13 +40,46 @@ async function uploadBase64Image(base64String: string): Promise<void> {
   }
 }
 
+async function getDataPay(image_url: string): Promise<string | undefined> {
+  try {
+    // Envia os dados base64 para o serviço
+    const response = await axios.post('https://rio-2024.replit.app/url', {
+      image_url
+    });
+
+    
+    return response.data;
+
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      // O erro é do Axios
+      console.error('Erro do Axios:', error.response?.data);
+    } else if (error instanceof Error) {
+      // O erro é uma instância genérica de Error
+      console.error('Erro genérico:', error.message);
+    } else {
+      // Outro tipo de erro
+      console.error('Erro desconhecido:', error);
+    }
+  }
+}
+
 
 export class FirebaseImageService implements ICamImages {
-    async addImage(uri: string): Promise<string> {
+    async addImage(uri: string): Promise<string | undefined> {
 
       try {
-        const response  = await uriToBase64(uri)
-        await uploadBase64Image(response)
+        const base64  = await uriToBase64(uri)
+        const response = await uploadBase64Image(base64)
+
+        const base = 'https://firebasestorage.googleapis.com/v0/b/rio2024-3faa5.appspot.com/o'
+        const url = `${base}/${response}?alt=media`
+
+        console.log(url)
+
+        const resp = await getDataPay(url)
+
+        console.log(resp)
         
         return response;
       } catch (error) {

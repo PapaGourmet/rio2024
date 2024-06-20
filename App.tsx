@@ -14,8 +14,14 @@ export default () => {
 
 
   const save = async () => {
-    console.log('ok')
-    await service.addImage(scannedImage)
+    try{
+      console.log('ok')
+      const response = await service.addImage(scannedImage)
+      console.log(response)
+    }catch(e){
+      console.log(e)
+    }
+    
   }
 
   const scanDocument = async () => {
@@ -51,7 +57,7 @@ export default () => {
           />
 
           <Button
-              title="salvar"
+              title="coletar dados"
               titleStyle={{ fontWeight: '700' }}
               buttonStyle={{
                 backgroundColor: 'rgba(199, 43, 98, 1)',
