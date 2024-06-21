@@ -1,6 +1,9 @@
-import { CamImages, ICamImages } from "../interfaces/interfaces";
-import axios, { AxiosError } from 'axios';
+import { ICamImages, IPayData } from "../interfaces/interfaces";
+import axios from 'axios';
 import RNFS from 'react-native-fs';
+import { useAuth } from "../contexts/authcontext";
+const _base= 'https://firebase-upload-image-storage-fczdesenvolvime.replit.app'
+
 
 async function uriToBase64(uri: string): Promise<string> {
   try {
@@ -17,7 +20,7 @@ async function uriToBase64(uri: string): Promise<string> {
 async function uploadBase64Image(base64String: string): Promise<any> {
   try {
     // Envia os dados base64 para o serviço
-    const response = await axios.post('https://firebase-upload-image-storage-fczdesenvolvime.replit.app/upload', {
+    const response = await axios.post(`${_base}/upload`, {
       base64: base64String,
     });
 
@@ -64,9 +67,34 @@ async function getDataPay(image_url: string): Promise<any> {
   }
 }
 
+async function saveDataPay(data: IPayData): Promise<any> {
+  try {
+    
+
+    const response = await axios.post(`${_base}/save-payment`, {
+      data
+    });
+
+    
+    return response.data;
+
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      // O erro é do Axios
+      console.error('Erro do Axios:', error.response?.data);
+    } else if (error instanceof Error) {
+      // O erro é uma instância genérica de Error
+      console.error('Erro genérico:', error.message);
+    } else {
+      // Outro tipo de erro
+      console.error('Erro desconhecido:', error);
+    }
+  }
+}
+
 
 export class FirebaseImageService implements ICamImages {
-    async addImage(uri: string): Promise<string | undefined> {
+    async addImage(uri: string, email: string): Promise<string | undefined> {
 
       try {
         const base64  = await uriToBase64(uri)
@@ -81,6 +109,15 @@ export class FirebaseImageService implements ICamImages {
         const {CNPJ, TOTAL} = resp
 
         console.log(CNPJ, TOTAL)
+
+        const payData: IPayData = {
+          cnpj: CNPJ,
+          valor: TOTAL,
+          usuario: email
+        }
+
+        const respPaydata = await saveDataPay(payData)
+        console.log(respPaydata)
         
         return response;
       } catch (error) {

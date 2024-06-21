@@ -1,12 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import 'react-native-gesture-handler';
-import { enableScreens } from 'react-native-screens';
 import RoutesScreens from './src/routes';
+import { AuthProvider } from './src/contexts/authcontext';
+import { DataProvider } from './src/contexts/datacontext';
 
 
 export default  () => {
 
   return (
-   <RoutesScreens />
-  );
+    <AuthProvider>
+      <DataProvider>
+        <RoutesScreens />
+      </DataProvider>
+    </AuthProvider>
+  )
+   
 };

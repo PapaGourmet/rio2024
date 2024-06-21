@@ -2,26 +2,33 @@ import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Input, Icon, Button } from '@rneui/themed';
 import { useNavigation } from '@react-navigation/native';
+import {  useAuth } from '../contexts/authcontext';
+import { styles } from '../styles';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigation = useNavigation<any>();
+  const {user, setUser} = useAuth()
 
   const handleLogin = () => {
     navigation.navigate('Init')
+    console.log(user)
   } 
 
   return (
     <View style={styles.container}>
         <Input
-            placeholder='BASIC INPUT'
+            placeholder='email'
+            onChangeText={(text) => {
+              setUser({...user, email: text.toLocaleLowerCase()})
+            }}
         />
       <Input
-            placeholder='BASIC INPUT'
+            placeholder='senha'
         />
       <Button
-              title={'React Native Elements'}
+              title={'acessar'}
               containerStyle={{
                 width: 200,
                 marginHorizontal: 50,
@@ -33,11 +40,3 @@ export default function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 10,
-  },
-});

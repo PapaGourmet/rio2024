@@ -6,6 +6,8 @@ import { FirebaseImageService } from './../../src/services/imageService';
 import { CamImages } from './../../src/interfaces/interfaces';
 import { Button } from '@rneui/themed';
 import { useNavigation } from '@react-navigation/native';
+import { styles } from '../styles';
+import { useAuth } from '../contexts/authcontext';
 
 
 export default function HomeScreen() {
@@ -14,12 +16,13 @@ export default function HomeScreen() {
     const _service = new FirebaseImageService()
     const service = new CamImages(_service)
     const navigation = useNavigation<any>();
+    const {user} = useAuth()
   
   
     const save = async () => {
       try{
         console.log('ok')
-        const response = await service.addImage(scannedImage)
+        const response = await service.addImage(scannedImage, user?.email || "")
         console.log(response)
       }catch(e){
         console.log(e)
@@ -106,14 +109,4 @@ export default function HomeScreen() {
     );
   };
   
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    image: {
-      width: 300,
-      height: 400,
-    },
-  });
+  
