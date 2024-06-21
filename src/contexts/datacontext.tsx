@@ -1,30 +1,35 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { IPayData } from '../interfaces/interfaces';
 
 
-interface Title {
-    content: string
-}
 
 // Definição dos tipos
-interface DataContextProps {
-  title: Title | null;
-  setTitle: React.Dispatch<React.SetStateAction<Title | null>>;
+interface PaymentContextProps {
+  payment: IPayData | null;
+  setPayment: React.Dispatch<React.SetStateAction<IPayData | null>>;
 }
 
 // Inicialização do contexto
-const DataContext = createContext<DataContextProps | undefined>(undefined);
+const PaymentContext = createContext<PaymentContextProps | undefined>(undefined);
 
-interface AuthProviderProps {
+interface PaymentProviderProps {
   children: ReactNode;
 }
 
-export const DataProvider = ({ children }: AuthProviderProps) => {
-  const [title, setTitle] = useState<Title | null>(null);
+export const PaymentProvider = ({ children }: PaymentProviderProps) => {
+  const [payment, setPayment] = useState<IPayData | null>(null);
 
   return (
-    <DataContext.Provider value={{ title, setTitle }}>
+    <PaymentContext.Provider value={{ payment, setPayment }}>
       {children}
-    </DataContext.Provider>
+    </PaymentContext.Provider>
   );
 };
 
+export const usePayment = () => {
+  const context = useContext(PaymentContext);
+  if (context === undefined) {
+    throw new Error('usePayment must be used within a PaymentProvider');
+  }
+  return context;
+};

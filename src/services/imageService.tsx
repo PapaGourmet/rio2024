@@ -1,8 +1,9 @@
 import { ICamImages, IPayData } from "../interfaces/interfaces";
 import axios from 'axios';
 import RNFS from 'react-native-fs';
-import { useAuth } from "../contexts/authcontext";
-const _base= 'https://firebase-upload-image-storage-fczdesenvolvime.replit.app'
+import { getTime } from 'date-fns';
+const _base= 'https://firebase-upload-image-storage-fczdesenvolvime.replit.app';
+
 
 
 async function uriToBase64(uri: string): Promise<string> {
@@ -71,9 +72,7 @@ async function saveDataPay(data: IPayData): Promise<any> {
   try {
     
 
-    const response = await axios.post(`${_base}/save-payment`, {
-      data
-    });
+    const response = await axios.post(`${_base}/save-payment`, data);
 
     
     return response.data;
@@ -92,16 +91,30 @@ async function saveDataPay(data: IPayData): Promise<any> {
   }
 }
 
+export default function getUTCInMilliseconds() {
+  const now = new Date();
+  const utcNow = Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate(),
+    now.getUTCHours(),
+    now.getUTCMinutes(),
+    now.getUTCSeconds(),
+    now.getUTCMilliseconds()
+  );
+  return getTime(new Date(utcNow));
+}
+
 
 export class FirebaseImageService implements ICamImages {
-    async addImage(uri: string, email: string): Promise<string | undefined> {
+    async addImage(uri: string, email: string): Promise<IPayData> {
 
       try {
         const base64  = await uriToBase64(uri)
-        const response = await uploadBase64Image(base64)
+        const imageBucket = await uploadBase64Image(base64)
 
         const base = 'https://firebasestorage.googleapis.com/v0/b/rio2024-3faa5.appspot.com/o'
-        const url = `${base}/${response}?alt=media`
+        const url = `${base}/${imageBucket}?alt=media`
 
         console.log(url)
 
@@ -112,14 +125,19 @@ export class FirebaseImageService implements ICamImages {
 
         const payData: IPayData = {
           cnpj: CNPJ,
-          valor: TOTAL,
-          usuario: email
+          valor: parseFloat(TOTAL.replace(',','.')),
+          usuario: email,
+          timestamp: getUTCInMilliseconds(),
+          url: `${base}/${imageBucket}?alt=media`
         }
+
+        console.log(119, payData)
 
         const respPaydata = await saveDataPay(payData)
         console.log(respPaydata)
+
+        return payData
         
-        return response;
       } catch (error) {
         console.error('Erro ao fazer upload da imagem: ', error);
         throw error;

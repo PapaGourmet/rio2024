@@ -8,6 +8,9 @@ import { Button } from '@rneui/themed';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from '../styles';
 import { useAuth } from '../contexts/authcontext';
+import { usePayment } from '../contexts/datacontext';
+
+
 
 
 export default function HomeScreen() {
@@ -16,15 +19,21 @@ export default function HomeScreen() {
     const _service = new FirebaseImageService()
     const service = new CamImages(_service)
     const navigation = useNavigation<any>();
-    const {user} = useAuth()
+    const { user } = useAuth()
+    const { setPayment } = usePayment()
   
   
     const save = async () => {
       try{
-        console.log('ok')
+        setLoading(true)
+        console.log('setado true')
         const response = await service.addImage(scannedImage, user?.email || "")
-        console.log(response)
+        setPayment(response)
+        setLoading(false)
+        navigation.navigate('Success')
       }catch(e){
+        setLoading(false)
+        navigation.navigate('Error')
         console.log(e)
       }
       

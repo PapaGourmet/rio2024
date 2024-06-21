@@ -1,11 +1,11 @@
 export interface ICamImages {
-    addImage(uri: string, email: string): Promise<string | undefined>
+    addImage(uri: string, email: string): Promise<IPayData>
 }
 
 export class CamImages {
     constructor(private service: ICamImages){}
 
-    async addImage(uri: string, email: string): Promise<string | undefined>{
+    async addImage(uri: string, email: string): Promise<IPayData>{
         return this.service.addImage(uri, email)
     }
 }
@@ -14,5 +14,7 @@ export class CamImages {
 export interface IPayData {
     cnpj: string,
     valor: number,
-    usuario: string
+    usuario: string,
+    timestamp: number,
+    url: string
 }
